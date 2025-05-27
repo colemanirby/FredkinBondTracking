@@ -1,14 +1,12 @@
-from classes import SpinChain, Metrics
+from spin_chain import SpinChain
 import pandas as pd
 
 def main():
     number_of_runs = 1000
-    metrics = Metrics()
     min_sector = 1
     max_sector = 2
     size = 64
     max_sector_for_size = ((size/2) - 1).__int__()
-    # print(bonds)
     for current_sector in range(min_sector, max_sector_for_size + 1):
         data = {}
         bonds = create_bonds_list(current_sector)
@@ -16,15 +14,6 @@ def main():
         filename = "data_N"+size.__str__()+"_s"+current_sector.__str__()+".csv"
         df = pd.DataFrame(data)
         df.to_csv(filename)
-    # print(data)
-
-    # print(df)
-
-    # df = create_data_frame(data)
-
-    # df = pd.DataFrame({"i_indices": metrics.i_positions, "j_indices": metrics.j_positions,"jmim1": metrics.jmim1_list, "Nmj": metrics.Nmj_list})
-    # df = pd.DataFrame({"i_indices": metrics.i_positions, "j_indices": metrics.j_positions, "k_indices": metrics.k_positions, "l_indices":metrics.l_positions, "jmim1": metrics.jmim1_list, "kmjm1": metrics.kmjm1_list, "lmkm1": metrics.lmkm1_list})
-    # df = pd.DataFrame({"i_indices": metrics.i_positions, "j_indices": metrics.j_positions, "k_indices": metrics.k_positions, "l_indices":metrics.l_positions, "m_indices": metrics.m_positions, "n_indices": metrics.n_positions, "jmim1": metrics.jmim1_list, "kmjm1": metrics.kmjm1_list, "lmkm1": metrics.lmkm1_list, "mmlm1": metrics.mmlm1_list, "nmmm1": metrics.nmmm1_list, "Nmn": metrics.Nmn_list})
     
 def simulate(number_of_runs, data, sector, size, bonds):
     
@@ -114,47 +103,6 @@ def collect_data(data: dict[str,list[int]], spin_chain: SpinChain, bonds, sector
             prev_name = spin
 
     return data
-
-
-    #     if spin == "i":
-    #         i_index = i
-    #         metrics.i_positions.append(i_index)
-    #     elif spin == "j":
-    #         j_index = i
-    #         metrics.j_positions.append(j_index)
-
-    #     elif spin == "k":
-    #         k_index = i
-    #         metrics.k_positions.append(k_index)
-
-    #     elif spin == "l":
-    #         l_index = i
-    #         metrics.l_positions.append(l_index)
-
-    #     # elif spin == "m":
-    #     #     m_index = i
-    #     #     metrics.m_positions.append(m_index)
-    #     # elif spin == "n":
-    #     #     n_index = i
-    #     #     metrics.n_positions.append(n_index)
-
-    # jmim1 = j_index - i_index - 1
-    # # Nmj = N - 1 - j_index
-    # kmjm1 = k_index - j_index - 1
-    # lmkm1 = l_index - k_index - 1
-    # Nml = N - 1 - l_index
-    # # mmlm1 = m_index - l_index - 1
-    # # nmmm1 = n_index - m_index - 1
-    # # Nn = N - 1 - n_index
-
-    # metrics.jmim1_list.append(jmim1)
-    # # metrics.Nmj_list.append(Nmj)
-    # metrics.kmjm1_list.append(kmjm1)
-    # metrics.lmkm1_list.append(lmkm1)
-    # metrics.Nml_list.append(Nml)
-    # metrics.mmlm1_list.append(mmlm1)
-    # metrics.nmmm1_list.append(nmmm1)
-    # metrics.Nmn_list.append(Nn)
 
 if __name__ == "__main__":
     main()

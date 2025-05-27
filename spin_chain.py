@@ -17,9 +17,6 @@ class SpinChain:
         self.chain[0] = 1
         self.chain[length-1] = -1
 
-        # bonds = {1: ["i", "j"], 2: ["i", "j", "k", "l"], 3: ["i", "j", "k", "l", "m", "n"]}
-        # self.generate_arbitrary_dyck_words(1, length-1, length-2)
-
         excited_sites = self.choose_excited_sites(length, sector)
         ##populate excited sites
 
@@ -78,8 +75,6 @@ class SpinChain:
                     height -= 1
                 current_index += 1
 
-
-
     def choose_excited_sites(self, N: int, s) -> list[int]:
         m_o = m_e = i = 0
 
@@ -104,10 +99,6 @@ class SpinChain:
                 else:
                     i += 2
         return sites
-
-
-
-
 
     def evolve(self) -> bool:
         N = len(self.chain) - 1
@@ -138,41 +129,3 @@ class SpinChain:
                 self.chain[middle_index] = left_spin
                 self.chain[left_index] = middle_spin
         return is_chain_dead
-
-
-
-
-
-
-class Metrics:
-
-    i_positions: list[int]
-    j_positions: list[int]
-    jmim1_list: list[int]
-    k_positions: list[int]
-    kmjm1_list: list[int]
-    l_positions: list[int]
-    lmkm1_list: list[int]
-    m_positions: list[int]
-    mmlm1_list: list[int]
-    n_positions: list[int]
-    nmmm1_list: list[int]
-    Nmj_list: list[int]
-    Nml_list: list[int]
-    Nmn_list: list[int]
-
-    def __init__(self):
-        self.i_positions = []
-        self.j_positions = []
-        self.k_positions = []
-        self.l_positions = []
-        self.m_positions = []
-        self.n_positions = []
-        self.jmim1_list = []
-        self.kmjm1_list = []
-        self.lmkm1_list = []
-        self.mmlm1_list = []
-        self.nmmm1_list = []
-        self.Nmj_list = []
-        self.Nml_list = []
-        self.Nmn_list = []
