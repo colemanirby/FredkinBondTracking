@@ -2,16 +2,16 @@ from spin_chain import SpinChain
 import pandas as pd
 
 def main():
-    number_of_runs = 1000
+    number_of_runs = 100
     min_sector = 1
     max_sector = 2
-    size = 64
+    size = 128
     max_sector_for_size = ((size/2) - 1).__int__()
     for current_sector in range(min_sector, max_sector_for_size + 1):
         data = {}
         bonds = create_bonds_list(current_sector)
         simulate(number_of_runs, data, current_sector, size, bonds)
-        filename = "data_N"+size.__str__()+"_s"+current_sector.__str__()+".csv"
+        filename = "Data/N"+size.__str__()+"/data_N"+size.__str__()+"_s"+current_sector.__str__()+".csv"
         df = pd.DataFrame(data)
         df.to_csv(filename)
     
@@ -20,9 +20,12 @@ def simulate(number_of_runs, data, sector, size, bonds):
     for _ in range(number_of_runs):
         spin_chain = SpinChain(size, sector, bonds)
         is_dead = False
+        evolve_count = 0
         while not is_dead:
-           data = collect_data(data, spin_chain, bonds, sector)
+           if evolve_count % (size/8) == 0:
+                data = collect_data(data, spin_chain, bonds, sector)
            is_dead = spin_chain.evolve()
+           evolve_count += 1
         print("completed ", _)       
         
 
@@ -85,7 +88,8 @@ def collect_data(data: dict[str,list[int]], spin_chain: SpinChain, bonds, sector
                 elif spin == max_bond_name:
                     difference_name = spin+"m"+prev_name+"m1"
                     prev_index_key = prev_name + "_index"
-                    prev_index = data[prev_index_key][0]
+                    last_inserted_index = len(data[prev_index_key]) - 1
+                    prev_index = data[prev_index_key][last_inserted_index]
                     difference = i - prev_index - 1
                     data[difference_name].append(difference)
                 
