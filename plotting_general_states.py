@@ -119,11 +119,15 @@ def slow_dyn(N):
 
 
 def main():
-    s = 1
+    s = 0
     m = 1
     N = 8
 
     print(theorem_3(N, s, m))
+    print(theorem_3(N , s, 0) )
+
+    # for i in range(m + 2):
+    #     print(math.comb( 1 + m - i, i))
 
     # print(theorem_3(N, s, 2))
     # print(theorem_3(N, s, 1))
