@@ -105,27 +105,66 @@ class SpinChain:
         left_index = random.randint(0, N - 2)
         middle_index = left_index + 1
         right_index = middle_index + 1
-        is_chain_dead = False
+
         left_spin = self.chain[left_index]
         middle_spin = self.chain[middle_index]
         right_spin = self.chain[right_index]
 
-        # control spin is 1
-        if left_spin == 1 or left_spin in self.bonds:
-            if (middle_spin == 1 or middle_spin in self.bonds) and right_spin == -1:
-                if right_index == N and (middle_spin in self.bonds or middle_spin == 1):
-                    is_chain_dead = True
-                elif right_index != N:
-                    self.chain[middle_index] = right_spin
-                    self.chain[right_index] = middle_spin
-            elif middle_spin == -1 and (right_spin == 1 or right_spin in self.bonds):
-                self.chain[middle_index] = right_spin
-                self.chain[right_index] = middle_spin
-            elif (middle_spin == -1 and right_spin == -1) and left_index != 0:
-                self.chain[middle_index] = left_spin
-                self.chain[left_index] = middle_spin
+        left_spin_value = self.determine_spin(left_spin)
+        middle_spin_value = self.determine_spin(middle_spin)
+        right_spin_value = self.determine_spin(right_spin) 
+
+        is_chain_dead = False
+
+        if left_spin in self.bonds or middle_spin in self.bonds or right_spin in self.bonds:
+            is_chain_dead = self.dyck_swap(left_spin_value, middle_spin_value, right_spin_value, left_spin, middle_spin, right_spin, left_index, middle_index, right_index, N)
         else:
-            if (middle_spin == 1 or middle_spin in self.bonds) and right_spin == -1 and left_index !=0:
-                self.chain[middle_index] = left_spin
-                self.chain[left_index] = middle_spin
+            self.direct_swap(left_spin_value, middle_spin_value, right_spin_value, left_index, middle_index, right_index, N)
         return is_chain_dead
+    
+    def dyck_swap(self, left_spin_value, middle_spin_value, right_spin_value, left_spin, middle_spin, right_spin, left_index, middle_index, right_index, N):
+            is_chain_dead = False
+    
+            if left_spin in self.bonds:
+                if middle_spin_value == 1 and right_spin_value == -1:
+                    if right_index == N:
+                        is_chain_dead = True
+                    else:
+                        self.chain[right_index] = left_spin
+                        self.chain[middle_index] = right_spin
+                        self.chain[left_index] = middle_spin
+            elif right_spin in self.bonds:
+                if right_index == N:
+                    raise Exception("something weird is happening!")
+                if left_spin_value == 1 and middle_spin_value == -1:
+                    self.chain[right_index] = middle_spin
+                    self.chain[middle_index] = left_spin
+                    self.chain[left_index] = right_spin
+            return is_chain_dead
+    
+    def direct_swap(self, left_spin_value, middle_spin_value, right_spin_value, left_index, middle_index, right_index, N):
+            if left_spin_value == 1:
+                if middle_spin_value == 1 and right_spin_value == -1:
+                    if right_index == N:
+                        raise Exception("Chain was killed in invalid way!!! Right Side")
+                    else:
+                        self.chain[middle_index] = right_spin_value
+                        self.chain[right_index] = middle_spin_value
+                elif middle_spin_value == -1 and right_spin_value == 1:
+                    self.chain[middle_index] = right_spin_value
+                    self.chain[right_index] = middle_spin_value
+                elif middle_spin_value == -1 and right_spin_value == -1 and left_index == 0:
+                    raise Exception("Chain was killed in invalid way!!! Left Side.")
+                elif middle_spin_value == -1 and right_spin_value == -1:
+                    self.chain[middle_index] = left_spin_value
+                    self.chain[left_index] = middle_spin_value
+            else:
+                if middle_spin_value == 1 and right_spin_value == -1:
+                    self.chain[middle_index] = left_spin_value
+                    self.chain[left_index] = middle_spin_value
+
+    def determine_spin(self, spin):
+        spin_value = spin
+        if spin in self.bonds:
+            spin_value = 1
+        return spin_value

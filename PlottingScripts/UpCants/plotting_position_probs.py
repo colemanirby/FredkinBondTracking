@@ -17,13 +17,13 @@ def create_bonds_list(sector) -> list[str]:
     return bonds
 
 def main():
-    N = 128
+    N = 64
     min_sector = 1
-    max_sector = 2
+    max_sector = 16
     max_sector_for_size = ((N/2) - 1).__int__()
-    for s in range(min_sector, max_sector_for_size + 1):
+    for s in range(min_sector, max_sector + 1):
         bonds = create_bonds_list(s)
-        filename = "Data/N"+N.__str__()+"/data_N"+N.__str__()+"_s"+s.__str__()+".csv"
+        filename = "Data/N"+N.__str__()+"/New/data_N"+N.__str__()+"_s"+s.__str__()+".csv"
         df = pd.read_csv(filename)
         all_positions = range(0, N)
         indices_dict = {}
@@ -40,8 +40,7 @@ def main():
         position_probs = counts_df.div(counts_df.sum())
 
         
-        # position_probs.plot(kind = 'bar', width = 1.0, color = colors, align = "center")
-        # sns.heatmap(position_probs.T, cmap = "viridis", cbar_kws={'label': 'Probability'})
+
         color_index = 0
         x_fine = np.linspace(0, (N-1), num = 10000*N)
         x = position_probs.index.to_numpy()
@@ -54,6 +53,8 @@ def main():
             plt.plot(x_fine, y_fine, label = col, color = colors[color_index])
             plt.fill_between(x_fine, y_fine, alpha=0.3, color = colors[color_index])
             color_index+=1
+        # position_probs.plot(kind = 'bar', width = 1.0, color = colors, align = "center")
+        # sns.heatmap(position_probs.T, cmap = "viridis", cbar_kws={'label': 'Probability'})
         plt.title("Positional Probabilities")
         plt.xticks(rotation = 45, fontsize = 5)
         plt.xlabel("Index")

@@ -21,48 +21,52 @@ class SpinChain:
         self.chain[0] = 1
         self.chain[length-1] = -1
 
-        mismatch_sites = self.choose_excited_sites(length/2 - 2, mismatches)
-        excited_sites = self.choose_excited_sites(length/2 - 2, sector)
+        mismatch_sites = self.choose_excited_sites(length - 2 - 2*sector, mismatches, 2)
+        m_offset = mismatch_sites[len(mismatch_sites) - 1] + 1
+        excited_sites = self.choose_excited_sites(length - m_offset, sector, m_offset)
         ##populate excited sites
 
         bond_index = 0
-        offset = ((length/2)).__int__()
         if(sector > 0 ):
             for i in excited_sites:
-                self.chain[i + offset] = self.up_cant_bonds[bond_index]
+                self.chain[i] = self.up_cant_bonds[bond_index]
                 bond_index += 1
+                # print("fosho no way")
 
+        # print("Chain after u: ", self.chain.copy())
         mismatch_index = 0
-        #offset by 2 to ensure that 2 left most spins are not selected
         for j in mismatch_sites:
-            self.chain[j + 2] = self.mismatch_bonds[mismatch_index]
+            self.chain[j] = self.mismatch_bonds[mismatch_index]
             mismatch_index+=1
+            # print("aint no way")
         ##fill in Dyck words
-        self.populate_left_side(mismatch_sites[0] + 2)
+        # print("Chain after m: ", self.chain.copy())
+        self.populate_left_side(mismatch_sites[0])
 
         index = 1
         while index < len(mismatch_sites):
-            left_bound_index = mismatch_sites[index - 1] + 2
-            right_bound_index = mismatch_sites[index] + 2
+            left_bound_index = mismatch_sites[index - 1]
+            right_bound_index = mismatch_sites[index]
             segment_length = right_bound_index - left_bound_index - 1
             self.generate_arbitrary_dyck_words(left_bound_index + 1, right_bound_index, segment_length)
+            # print("STUCK :000000000")
             index +=1
         if sector == 0:
-            last_bond_position = mismatch_sites[len(mismatch_sites) - 1] + 2
+            last_bond_position = mismatch_sites[len(mismatch_sites) - 1]
             segment_length = length - last_bond_position - 1
             self.generate_arbitrary_dyck_words(last_bond_position + 1, length, segment_length)
         else:
-            last_mismatch_site_position = mismatch_sites[len(mismatch_sites) - 1] + 2
-            segment_length = excited_sites[0] + offset - last_mismatch_site_position - 1
-            self.generate_arbitrary_dyck_words(last_mismatch_site_position+1, excited_sites[0] + offset, segment_length)
+            last_mismatch_site_position = mismatch_sites[len(mismatch_sites) - 1]
+            segment_length = excited_sites[0] - last_mismatch_site_position - 1
+            self.generate_arbitrary_dyck_words(last_mismatch_site_position+1, excited_sites[0], segment_length)
             index = 1
             while index < len(excited_sites):
-                left_bound_index = excited_sites[index - 1] + offset
-                right_bound_index = excited_sites[index] + offset
+                left_bound_index = excited_sites[index - 1]
+                right_bound_index = excited_sites[index]
                 segment_length = right_bound_index - left_bound_index - 1
                 self.generate_arbitrary_dyck_words(left_bound_index + 1, right_bound_index, segment_length)
                 index +=1
-            last_bond_position = excited_sites[len(excited_sites) - 1] + offset
+            last_bond_position = excited_sites[len(excited_sites) - 1]
             segment_length = length - last_bond_position - 1
             self.generate_arbitrary_dyck_words(last_bond_position + 1, length, segment_length)
 
@@ -103,7 +107,7 @@ class SpinChain:
                     height -= 1
                 current_index += 1
 
-    def choose_excited_sites(self, N: int, s) -> list[int]:
+    def choose_excited_sites(self, N: int, s, offset) -> list[int]:
         m_o = m_e = 0
 
         i = 0
@@ -115,7 +119,7 @@ class SpinChain:
             if i % 2 == 0:
                 prob = 2*(s - m_e)/(N - 2 - i)
                 if number <= prob:
-                    sites.append(i)
+                    sites.append(i + offset)
                     i += 1
                     m_e += 1
                 else:
@@ -123,7 +127,7 @@ class SpinChain:
             else:
                 prob = 2*(s - m_o)/(N - 1 - i)
                 if number <= prob:
-                    sites.append(i)
+                    sites.append(i + offset)
                     i += 1
                     m_o += 1
                 else:
@@ -148,7 +152,7 @@ class SpinChain:
         if left_spin in self.all_bonds or middle_spin in self.all_bonds or right_spin in self.all_bonds:
             is_chain_dead = self.dyck_swap(left_spin_value, middle_spin_value, right_spin_value, left_spin, middle_spin, right_spin, left_index, middle_index, right_index, N)
         else:
-           is_chain_dead = self.direct_swap(left_spin_value, middle_spin_value, right_spin_value, left_index, middle_index, right_index, N)
+           self.direct_swap(left_spin_value, middle_spin_value, right_spin_value, left_index, middle_index, right_index, N)
 
         
         return is_chain_dead
@@ -179,13 +183,10 @@ class SpinChain:
         
 
     def direct_swap(self, left_spin_value, middle_spin_value, right_spin_value, left_index, middle_index, right_index, N):
-        is_chain_dead = False
         if left_spin_value == 1:
             if middle_spin_value == 1 and right_spin_value == -1:
                 if right_index == N:
-                    print(self.chain)
                     raise Exception("Chain was killed in invalid way!!! Right Side")
-                    is_chain_dead = True
                 else:
                     self.chain[middle_index] = right_spin_value
                     self.chain[right_index] = middle_spin_value
@@ -193,9 +194,7 @@ class SpinChain:
                 self.chain[middle_index] = right_spin_value
                 self.chain[right_index] = middle_spin_value
             elif middle_spin_value == -1 and right_spin_value == -1 and left_index == 0:
-                print(self.chain)
                 raise Exception("Chain was killed in invalid way!!! Left Side.")
-                is_chain_dead = True
             elif middle_spin_value == -1 and right_spin_value == -1:
                 self.chain[middle_index] = left_spin_value
                 self.chain[left_index] = middle_spin_value
@@ -203,7 +202,6 @@ class SpinChain:
             if middle_spin_value == 1 and right_spin_value == -1:
                 self.chain[middle_index] = left_spin_value
                 self.chain[left_index] = middle_spin_value
-        return is_chain_dead
 
     def determine_spin(self, spin):
         spin_value = spin

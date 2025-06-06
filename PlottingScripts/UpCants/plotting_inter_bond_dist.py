@@ -13,12 +13,12 @@ def create_bonds_list(sector) -> list[str]:
     return bonds
 
 def main():
-    N = 64
+    N = 128
     min_sector = 1
     max_sector = 2
     max_sector_for_size = ((N/2) - 1).__int__()
-    for s in range(min_sector, max_sector_for_size):
-        os.makedirs("Plots/N"+N.__str__()+"/inter_bond_distances/s"+s.__str__()+"/", exist_ok = True)
+    for s in range(min_sector, max_sector_for_size + 1):
+        os.makedirs("Plots/N"+N.__str__()+"/inter_bond_distances/New/s"+s.__str__()+"/", exist_ok = True)
         bonds = create_bonds_list(s)
         filename = "Data/N"+N.__str__()+"/data_N"+N.__str__()+"_s"+s.__str__()+".csv"
         df = pd.read_csv(filename)
@@ -49,7 +49,7 @@ def main():
             elif col == "Nm"+final_bond_name:
                 bond_distance_name = final_bond_name + " Distance from Right Edge"
             
-            plot_name = "Plots/N"+N.__str__()+"/inter_bond_distances/s"+s.__str__()+"/inter_bond_distances_N" + N.__str__() + "_s"+s.__str__()+"_"+col+".jpg"
+            plot_name = "Plots/N"+N.__str__()+"/inter_bond_distances/New/s"+s.__str__()+"/inter_bond_distances_N" + N.__str__() + "_s"+s.__str__()+"_"+col+".jpg"
             distance_to_plot = distances_df[col]
             distance_to_plot.hist(bins=N)
             plt.title(bond_distance_name)

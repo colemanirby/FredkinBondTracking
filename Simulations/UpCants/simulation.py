@@ -2,31 +2,41 @@ from spin_chain import SpinChain
 import pandas as pd
 
 def main():
-    number_of_runs = 100
+    number_of_runs = 1000
     min_sector = 1
-    max_sector = 2
-    size = 128
+    max_sector = 16
+    size = 64
     max_sector_for_size = ((size/2) - 1).__int__()
     for current_sector in range(min_sector, max_sector_for_size + 1):
         data = {}
         bonds = create_bonds_list(current_sector)
         simulate(number_of_runs, data, current_sector, size, bonds)
-        filename = "Data/N"+size.__str__()+"/data_N"+size.__str__()+"_s"+current_sector.__str__()+".csv"
+        filename = "Data/N"+size.__str__()+"/New/data_N"+size.__str__()+"_s"+current_sector.__str__()+".csv"
         df = pd.DataFrame(data)
         df.to_csv(filename)
     
 def simulate(number_of_runs, data, sector, size, bonds):
-    
     for _ in range(number_of_runs):
-        spin_chain = SpinChain(size, sector, bonds)
         is_dead = False
         evolve_count = 0
+        properly_shuffled = False
+        while not properly_shuffled:
+            spin_chain = SpinChain(size, sector, bonds)
+            did_die = False
+            for shuffle in range(0, size^2):
+                did_die = spin_chain.evolve()
+                if(did_die):
+                    break
+            if not did_die:
+                properly_shuffled = True 
+
         while not is_dead:
-           if evolve_count % (size/8) == 0:
+            if evolve_count % (size/4) == 0:
                 data = collect_data(data, spin_chain, bonds, sector)
-           is_dead = spin_chain.evolve()
-           evolve_count += 1
-        print("completed ", _)       
+            is_dead = spin_chain.evolve()
+            evolve_count += 1
+        
+        print("completed ", _)   
         
 
 def create_bonds_list(sector) -> list[str]:
@@ -101,7 +111,7 @@ def collect_data(data: dict[str,list[int]], spin_chain: SpinChain, bonds, sector
                     prev_index_array = data[prev_index_key]
                     prev_index = prev_index_array[len(prev_index_array)-1]
                     difference_name = spin + "m" + prev_name + "m1"
-                    difference = i - prev_index
+                    difference = i - prev_index - 1
                     data[difference_name].append(difference)
 
             prev_name = spin
