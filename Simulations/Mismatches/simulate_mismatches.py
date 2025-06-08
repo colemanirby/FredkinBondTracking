@@ -3,36 +3,38 @@ import pandas as pd
 import time
 import os
 def main():
-    N = 64
+    min_N = 250
+    max_N = 300
+    # N = 64
     number_of_runs = 1000
     min_m = 1
     min_sector = 0
-    max_sector_for_size = (N/2 - 1).__int__()
 
-    
-    for s in range(min_sector, max_sector_for_size):
-        max_m = (N/2 - 2 - s).__int__()
-        for m in range(min_m, max_m + 1):
-            os.makedirs("Data/N"+N.__str__()+"/Mismatches/s"+s.__str__()+"/lifetimes", exist_ok = True)
-            os.makedirs("Data/N"+N.__str__()+"/Mismatches/s"+s.__str__()+"/spin_info/", exist_ok = True)
-            lifetime_data = {}
-            lifetime_data["lifetimes"] = []
-            bond_distance_data = {}
-            print("s ",s, "m ",m)
-            s_bonds = create_bonds_list(False, s)
-            m_bonds = create_bonds_list(True, m)
-            simulate(number_of_runs, lifetime_data, bond_distance_data, N, m, s, m_bonds, s_bonds)
-            print("completed")
-            filename = "Data/N"+N.__str__()+"/Mismatches/s"+s.__str__()+"/lifetimes/m"+m.__str__()+"_lifetimes.csv"
-            df = pd.DataFrame(lifetime_data)
-            df.to_csv(filename)
-            filename = "Data/N"+N.__str__()+"/Mismatches/s"+s.__str__()+"/spin_info/m"+m.__str__()+"_spin_info.csv"
-            # for key in bond_distance_data:
-                # print(key , " ", len(bond_distance_data[key]))
-            df_distances = pd.DataFrame(bond_distance_data)
-            df_distances.to_csv(filename)
-        
-        # print(bond_distance_data)
+    for N in range(min_N, max_N, 2):    
+        max_sector_for_size = (N/2 - 1).__int__()
+        for s in range(min_sector, max_sector_for_size):
+            max_m = (N/2 - 2 - s).__int__()
+            for m in range(min_m, max_m + 1):
+                os.makedirs("Data/N"+N.__str__()+"/Mismatches/s"+s.__str__()+"/lifetimes", exist_ok = True)
+                os.makedirs("Data/N"+N.__str__()+"/Mismatches/s"+s.__str__()+"/spin_info/", exist_ok = True)
+                lifetime_data = {}
+                lifetime_data["lifetimes"] = []
+                bond_distance_data = {}
+                print("s ",s, "m ",m)
+                s_bonds = create_bonds_list(False, s)
+                m_bonds = create_bonds_list(True, m)
+                simulate(number_of_runs, lifetime_data, bond_distance_data, N, m, s, m_bonds, s_bonds)
+                print("completed")
+                filename = "Data/N"+N.__str__()+"/Mismatches/s"+s.__str__()+"/lifetimes/m"+m.__str__()+"_lifetimes.csv"
+                df = pd.DataFrame(lifetime_data)
+                df.to_csv(filename)
+                filename = "Data/N"+N.__str__()+"/Mismatches/s"+s.__str__()+"/spin_info/m"+m.__str__()+"_spin_info.csv"
+                # for key in bond_distance_data:
+                    # print(key , " ", len(bond_distance_data[key]))
+                df_distances = pd.DataFrame(bond_distance_data)
+                df_distances.to_csv(filename)
+
+            # print(bond_distance_data)
         
 
     # print(lifetime_data)
@@ -66,8 +68,8 @@ def simulate(number_of_runs, lifetime_data, bond_distance_data, size, m, s, m_bo
         while not is_dead:
             is_dead = spin_chain.evolve()
             lifetime+=1
-            if lifetime % (size/8) == 0:
-                collect_data(bond_distance_data, spin_chain, all_bonds, s, m)
+            # if lifetime % (size/8) == 0:
+            collect_data(bond_distance_data, spin_chain, all_bonds, s, m)
         lifetime_data["lifetimes"].append(lifetime)
     
 
